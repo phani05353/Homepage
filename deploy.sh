@@ -12,8 +12,8 @@ set -e
 
 REPO_URL="https://github.com/phani05353/Homepage"
 REPO_DIR="homepage-app"
-IMAGE_NAME="homepage"
-CONTAINER_NAME="homepage"
+IMAGE_NAME="myhomepage"
+CONTAINER_NAME="myhomepage"
 HOST_PORT="${HOST_PORT:-9111}"
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
