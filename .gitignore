@@ -1,0 +1,21 @@
+# OpenWolf — internal context files (not for version control)
+.wolf/
+CLAUDE.md
+.claude/
+
+# Node
+node_modules/
+homepage-app/node_modules/
+
+# Build output
+homepage-app/dist/
+homepage-app/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
