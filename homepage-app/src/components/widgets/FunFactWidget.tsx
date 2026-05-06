@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, RefreshCw } from 'lucide-react';
+import { Zap, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useFunFact } from '../../hooks/useFunFact';
 
 function Skeleton() {
@@ -13,7 +13,7 @@ function Skeleton() {
 }
 
 export default function FunFactWidget() {
-  const { fact, loading, error, fetchAnother } = useFunFact();
+  const { fact, loading, isLive, fetchAnother } = useFunFact();
   const [spinning, setSpinning] = useState(false);
 
   const handleAnother = () => {
@@ -28,12 +28,16 @@ export default function FunFactWidget() {
           <Zap size={16} className="text-amber-300" />
           <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Fun Fact</span>
         </div>
-        <span className="text-xs text-amber-300/70 bg-amber-500/15 px-2 py-0.5 rounded-full">Today</span>
+        {!loading && (
+          <span className="flex items-center gap-1 text-xs text-amber-300/70 bg-amber-500/15 px-2 py-0.5 rounded-full">
+            {isLive ? <Wifi size={10} /> : <WifiOff size={10} />}
+            {isLive ? 'Live' : 'Today'}
+          </span>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
         {loading && <Skeleton />}
-        {error && <p className="text-white/40 text-sm my-auto">{error}</p>}
         {fact && !loading && (
           <>
             <span className="text-3xl">💡</span>
