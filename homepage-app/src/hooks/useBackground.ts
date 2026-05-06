@@ -1,26 +1,18 @@
 import { useEffect, useState } from 'react';
-import { BACKGROUNDS } from '../config';
 
 export function useBackground() {
-  const [bg, setBg] = useState('');
+  // Date-seeded so it changes daily and is consistent within a day.
+  // Picsum serves curated Unsplash-quality landscape photos.
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const bg = `https://picsum.photos/seed/${dateStr}/1920/1080`;
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const dayIndex = Math.floor(Date.now() / 86400000) % BACKGROUNDS.length;
-    const url = BACKGROUNDS[dayIndex];
     const img = new Image();
-    img.onload = () => {
-      setBg(url);
-      setLoaded(true);
-    };
-    img.onerror = () => {
-      // fallback: use next image
-      const fallback = BACKGROUNDS[(dayIndex + 1) % BACKGROUNDS.length];
-      setBg(fallback);
-      setLoaded(true);
-    };
-    img.src = url;
-  }, []);
+    img.onload = () => setLoaded(true);
+    img.onerror = () => setLoaded(true);
+    img.src = bg;
+  }, [bg]);
 
   return { bg, loaded };
 }

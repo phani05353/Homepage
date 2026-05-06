@@ -1,82 +1,92 @@
 import { useState } from 'react';
-import { BookOpen, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
-import { WORDS, getWordOfDay } from '../../data/vocabulary';
+import { BookOpen, RefreshCw, Sparkles } from 'lucide-react';
+import { useWordOfDay } from '../../hooks/useWordOfDay';
+
+function Skeleton() {
+  return (
+    <div className="animate-pulse flex flex-col gap-3 items-center justify-center h-28">
+      <div className="h-7 w-36 bg-white/10 rounded-lg" />
+      <div className="h-4 w-24 bg-white/10 rounded" />
+      <div className="h-3 w-20 bg-white/10 rounded" />
+    </div>
+  );
+}
 
 export default function VocabWidget() {
-  const todayIndex = WORDS.indexOf(getWordOfDay());
-  const [index, setIndex] = useState(todayIndex);
+  const { data, loading, error, refresh } = useWordOfDay();
   const [flipped, setFlipped] = useState(false);
+  const [spinning, setSpinning] = useState(false);
 
-  const word = WORDS[index];
-  const isToday = index === todayIndex;
-
-  const prev = () => { setIndex((i) => (i - 1 + WORDS.length) % WORDS.length); setFlipped(false); };
-  const next = () => { setIndex((i) => (i + 1) % WORDS.length); setFlipped(false); };
+  const handleRefresh = () => {
+    setSpinning(true);
+    setFlipped(false);
+    refresh().then(() => setSpinning(false));
+  };
 
   return (
-    <div className="glass-dark rounded-3xl p-5 widget-shadow flex flex-col gap-4 min-h-[200px]">
+    <div className="glass-dark rounded-3xl p-5 widget-shadow flex flex-col gap-4 min-h-[220px]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen size={16} className="text-violet-300" />
-          <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Vocabulary</span>
+          <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Word of the Day</span>
         </div>
-        {isToday && (
-          <span className="flex items-center gap-1 text-xs text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded-full">
-            <Sparkles size={10} />
-            Today's word
-          </span>
-        )}
+        <span className="flex items-center gap-1 text-xs text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded-full">
+          <Sparkles size={10} />
+          Live
+        </span>
       </div>
 
-      {/* Flash card */}
-      <div
-        className="relative flex-1 cursor-pointer"
-        style={{ perspective: '1000px', minHeight: 120 }}
-        onClick={() => setFlipped((f) => !f)}
-      >
-        <div
-          className="w-full h-full transition-all duration-500"
-          style={{
-            transformStyle: 'preserve-3d',
-            transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-            minHeight: 120,
-          }}
-        >
-          {/* Front */}
+      {loading && <Skeleton />}
+      {error && <p className="text-white/40 text-sm text-center my-auto">{error}</p>}
+
+      {data && !loading && (
+        <>
+          {/* Flip card */}
           <div
-            className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
-            style={{ backfaceVisibility: 'hidden' }}
+            className="relative flex-1 cursor-pointer"
+            style={{ perspective: '1000px', minHeight: 120 }}
+            onClick={() => setFlipped((f) => !f)}
           >
-            <p className="text-2xl font-semibold text-white">{word.word}</p>
-            <p className="text-white/50 text-sm font-mono">{word.phonetic}</p>
-            <span className="text-xs text-violet-300/70 mt-1 italic">{word.partOfSpeech}</span>
-            <p className="text-white/30 text-xs mt-2">Tap to reveal meaning</p>
+            <div
+              className="w-full h-full transition-all duration-500"
+              style={{ transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)', minHeight: 120 }}
+            >
+              {/* Front */}
+              <div
+                className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
+                <p className="text-2xl font-semibold text-white capitalize">{data.word}</p>
+                {data.phonetic && <p className="text-white/50 text-sm font-mono">{data.phonetic}</p>}
+                <span className="text-xs text-violet-300/70 italic">{data.partOfSpeech}</span>
+                <p className="text-white/25 text-xs mt-2">Tap to reveal meaning</p>
+              </div>
+
+              {/* Back */}
+              <div
+                className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-500/20 p-4"
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
+                <p className="text-white text-sm leading-relaxed">{data.meaning}</p>
+                {data.example && (
+                  <p className="text-white/50 text-xs italic">"{data.example}"</p>
+                )}
+                {data.origin && (
+                  <p className="text-violet-300/60 text-xs">Origin: {data.origin}</p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Back */}
-          <div
-            className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-500/20 p-4"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-2 text-white/40 hover:text-violet-300 transition-colors text-xs self-end"
           >
-            <p className="text-white text-sm leading-relaxed">{word.meaning}</p>
-            <p className="text-white/50 text-xs italic">"{word.example}"</p>
-            {word.origin && (
-              <p className="text-violet-300/60 text-xs">Origin: {word.origin}</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button onClick={prev} className="text-white/40 hover:text-white transition-colors p-1">
-          <ChevronLeft size={16} />
-        </button>
-        <p className="text-white/30 text-xs">{index + 1} / {WORDS.length}</p>
-        <button onClick={next} className="text-white/40 hover:text-white transition-colors p-1">
-          <ChevronRight size={16} />
-        </button>
-      </div>
+            <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
+            New word
+          </button>
+        </>
+      )}
     </div>
   );
 }
