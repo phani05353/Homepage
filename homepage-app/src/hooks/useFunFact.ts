@@ -5,8 +5,12 @@ export interface DailyFact {
   sourceUrl?: string;
 }
 
-// ── Fallback facts (used if the live API is blocked / unreachable) ──────────
-const FALLBACK_FACTS: string[] = [
+// Nginx proxies /proxy/facts/* → https://uselessfacts.jsph.pl/api/facts/*
+// This avoids the browser CORS restriction entirely — Nginx fetches it server-side.
+const PROXY_TODAY  = '/proxy/facts/today?language=en';
+const PROXY_RANDOM = '/proxy/facts/random?language=en';
+
+const FALLBACK: string[] = [
   "Honey never expires. Archaeologists found 3,000-year-old honey in Egyptian tombs — still perfectly edible.",
   "A group of flamingos is called a 'flamboyance'. They are literally named for being extra.",
   "The shortest war in history lasted 38–45 minutes — Britain vs Zanzibar in 1896.",
@@ -41,96 +45,72 @@ const FALLBACK_FACTS: string[] = [
   "An octopus can unscrew a jar from the inside.",
   "There are more trees on Earth than stars in the Milky Way.",
   "Penguins propose to each other with pebbles.",
-  "A group of pugs is called a 'grumble'.",
   "Sloths can hold their breath longer than dolphins — up to 40 minutes.",
-  "Pistachios are technically a fruit.",
-  "Turtles can breathe through their butts — it's called cloacal respiration.",
-  "The word 'nerd' was first used in Dr Seuss's 'If I Ran the Zoo' in 1950.",
-  "The shortest place name on Earth is 'Å' — a village in Norway.",
-  "Catfish have about 100,000 taste buds — humans have around 10,000.",
-  "A group of porcupines is called a prickle.",
-  "The inventor of the chocolate chip cookie sold the idea to Nestlé for a lifetime supply of chocolate.",
-  "It takes glass about one million years to fully decompose.",
+  "The word 'nerd' first appeared in Dr Seuss's 'If I Ran the Zoo' in 1950.",
+  "Catfish have about 100,000 taste buds. Humans have around 10,000.",
   "Koalas have fingerprints virtually identical to humans.",
-  "The Sahara Desert was once a lush savannah — about 10,000 years ago.",
-  "A day on Mercury lasts longer than a year on Mercury.",
-  "Astronauts grow up to 2 inches taller in space.",
+  "Astronauts grow up to 2 inches taller in space due to spinal decompression.",
   "The smell of rain has a name: petrichor.",
   "A group of rhinos is called a crash.",
-  "There are more fake flamingos in the world than real ones.",
-  "Spiders can't fly — but they can travel hundreds of miles by riding the wind on silk threads.",
   "Apples are 25% air, which is why they float.",
-  "The average person walks 100,000 miles in a lifetime — about 4 times around the Earth.",
   "Polar bears have black skin under their white fur.",
   "The first webcam was invented to monitor a coffee pot at Cambridge University.",
-  "Almonds are a member of the peach family.",
   "A shrimp's heart is in its head.",
   "Elephants are the only animals that can't jump.",
-  "The Twitter bird's official name is Larry, after Larry Bird of the Boston Celtics.",
   "A group of cats is called a clowder.",
-  "You can't hum while holding your nose closed.",
-  "More people are killed each year by vending machines than by sharks.",
   "Leeches have 32 brains.",
-  "The Milky Way smells like rum and tastes of raspberries, according to astronomers.",
-  "The founder of Match.com lost his girlfriend to a man she met on Match.com.",
   "Cows produce more milk when listening to slow music.",
   "Seahorses are the only animal where the male gives birth.",
-  "The Bermuda Triangle contains no more shipwrecks than any other region of the ocean.",
-  "The word 'sandwich' is named after the Earl of Sandwich, who ate meat between bread so he could keep gambling.",
-  "There are more possible sudoku puzzles than atoms on Earth.",
-  "Figs contain dead wasps — they enter the fruit to lay eggs and can't escape.",
+  "Figs contain dead wasps — wasps enter the fruit to lay eggs and can't escape.",
   "Rabbits cannot vomit.",
-  "Paper was invented in China in 105 AD — roughly 1,400 years before it reached Europe.",
-  "The average person spends 6 months of their lifetime waiting for a red light.",
   "Giraffes have the same number of neck vertebrae as humans — seven.",
   "Scotland's national animal is the unicorn.",
-  "South Korea has a museum dedicated entirely to toilets.",
   "The dot over the letter 'i' is called a tittle.",
   "Dogs have three eyelids.",
-  "The longest English word without a vowel is 'rhythms'.",
-  "Every 'odd' number has the letter 'e' in it when written out.",
-  "Pogonophobia is the fear of beards.",
   "The planet Uranus was originally named 'Georgium Sidus' after King George III.",
-  "Chameleons don't actually change colour to camouflage — they do it to communicate.",
   "Crocodiles cannot stick their tongues out.",
   "A group of jellyfish is called a 'smack'.",
-  "The human nose can detect over 1 trillion different scents.",
-  "The original purpose of bubble wrap was to be used as wallpaper.",
   "A single strand of spaghetti is called a 'spaghetto'.",
   "Lobsters were once considered so cheap they were fed to prisoners.",
-  "The world's oldest piece of chewing gum is over 9,000 years old.",
-  "The longest time between two twins being born is 87 days.",
   "Tigers have striped skin, not just striped fur.",
   "Ants never sleep.",
-  "Waking up takes 40 muscles — smiling takes 17.",
-  "A bolt of lightning contains enough energy to toast 100,000 slices of bread.",
   "The yo-yo was originally used as a weapon in the Philippines.",
+  "The longest English word without a vowel is 'rhythms'.",
+  "Pineapples take two years to grow.",
+  "The moon is moving away from Earth at about 3.8 cm per year.",
+  "Coca-Cola would be green if food colouring wasn't added.",
+  "A sneeze travels at about 100 mph.",
+  "The average person will spend 6 years of their life dreaming.",
+  "Spiders can travel hundreds of miles by riding the wind on silk threads.",
+  "Almonds are a member of the peach family.",
+  "Pistachios are technically a fruit.",
+  "Turtles can breathe through their butts — it's called cloacal respiration.",
 ];
 
 const CACHE_KEY = `hw_fact_${new Date().toDateString()}`;
 
-function getFallbackFact(): DailyFact {
-  const dayIndex = Math.floor(Date.now() / 86400000);
-  return { text: FALLBACK_FACTS[dayIndex % FALLBACK_FACTS.length] };
+function fallbackByDay(): DailyFact {
+  const idx = Math.floor(Date.now() / 86400000) % FALLBACK.length;
+  return { text: FALLBACK[idx] };
+}
+function fallbackRandom(): DailyFact {
+  return { text: FALLBACK[Math.floor(Math.random() * FALLBACK.length)] };
 }
 
-function getRandomFallback(): DailyFact {
-  return { text: FALLBACK_FACTS[Math.floor(Math.random() * FALLBACK_FACTS.length)] };
-}
-
-async function fetchLiveFact(random: boolean): Promise<DailyFact> {
-  const url = random
-    ? 'https://uselessfacts.jsph.pl/api/facts/random?language=en'
-    : 'https://uselessfacts.jsph.pl/api/facts/today?language=en';
-  const data = await fetch(url, { signal: AbortSignal.timeout(4000) }).then((r) => r.json());
+async function fetchProxy(random: boolean): Promise<DailyFact> {
+  const res = await fetch(random ? PROXY_RANDOM : PROXY_TODAY, {
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error('proxy error');
+  const data = await res.json();
   if (!data?.text) throw new Error('empty');
   return { text: data.text, sourceUrl: data.source_url };
 }
 
 export function useFunFact() {
-  const [fact, setFact] = useState<DailyFact | null>(null);
+  const [fact, setFact]     = useState<DailyFact | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isLive, setIsLive] = useState(false);
+  const [isLive, setIsLive]   = useState(false);
 
   const load = async (random = false) => {
     setLoading(true);
@@ -138,22 +118,22 @@ export function useFunFact() {
       if (!random) {
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
-          const parsed = JSON.parse(cached);
-          setFact(parsed);
-          setIsLive(!!parsed.sourceUrl);
+          const p = JSON.parse(cached);
+          setFact(p);
+          setIsLive(!!p.sourceUrl);
           setLoading(false);
           return;
         }
       }
 
-      // Try live API; fall back silently to local list
       try {
-        const result = await fetchLiveFact(random);
+        const result = await fetchProxy(random);
         if (!random) localStorage.setItem(CACHE_KEY, JSON.stringify(result));
         setFact(result);
         setIsLive(true);
       } catch {
-        const result = random ? getRandomFallback() : getFallbackFact();
+        // Nginx proxy unavailable (dev mode / no container) — use local list
+        const result = random ? fallbackRandom() : fallbackByDay();
         if (!random) localStorage.setItem(CACHE_KEY, JSON.stringify(result));
         setFact(result);
         setIsLive(false);

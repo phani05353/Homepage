@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { Zap, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useFunFact } from '../../hooks/useFunFact';
 
-function Skeleton() {
-  return (
-    <div className="animate-pulse flex flex-col gap-3 flex-1">
-      <div className="h-4 w-full bg-white/10 rounded" />
-      <div className="h-4 w-4/5 bg-white/10 rounded" />
-      <div className="h-4 w-3/5 bg-white/10 rounded" />
-    </div>
-  );
+function isSafeUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 export default function FunFactWidget() {
@@ -37,18 +36,20 @@ export default function FunFactWidget() {
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
-        {loading && <Skeleton />}
+        {loading && (
+          <div className="animate-pulse flex flex-col gap-3 flex-1">
+            <div className="h-4 w-full bg-white/10 rounded" />
+            <div className="h-4 w-4/5 bg-white/10 rounded" />
+            <div className="h-4 w-3/5 bg-white/10 rounded" />
+          </div>
+        )}
         {fact && !loading && (
           <>
             <span className="text-3xl">💡</span>
             <p className="text-white text-sm leading-relaxed">{fact.text}</p>
-            {fact.sourceUrl && (
-              <a
-                href={fact.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-300/50 text-xs hover:text-amber-300/80 transition-colors"
-              >
+            {fact.sourceUrl && isSafeUrl(fact.sourceUrl) && (
+              <a href={fact.sourceUrl} target="_blank" rel="noopener noreferrer"
+                className="text-amber-300/50 text-xs hover:text-amber-300/80 transition-colors">
                 Source ↗
               </a>
             )}
@@ -56,10 +57,8 @@ export default function FunFactWidget() {
         )}
       </div>
 
-      <button
-        onClick={handleAnother}
-        className="flex items-center gap-2 text-white/40 hover:text-amber-300 transition-colors text-xs self-end"
-      >
+      <button onClick={handleAnother}
+        className="flex items-center gap-2 text-white/40 hover:text-amber-300 transition-colors text-xs self-end">
         <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
         Another one
       </button>
