@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Quote, RefreshCw } from 'lucide-react';
+import { Quote, RefreshCw, AlertCircle } from 'lucide-react';
 import { useQuote } from '../../hooks/useQuote';
 
 function Skeleton() {
@@ -22,29 +22,47 @@ export default function QuoteWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
-      <div className="flex items-center gap-2">
-        <Quote size={16} className="text-emerald-300" />
-        <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Quote of the Day</span>
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-emerald-500/20 ring-1 ring-emerald-300/20 flex items-center justify-center">
+            <Quote size={13} className="text-emerald-200" />
+          </div>
+          <span className="text-white/70 text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase">
+            Quote of the Day
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 pulse-soft" />
+          <span className="text-emerald-200/80 text-[10px] uppercase tracking-wider">Live</span>
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
         {loading && <Skeleton />}
-        {error && <p className="text-white/40 text-sm my-auto">{error}</p>}
+
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center flex-1 gap-2 text-white/40">
+            <AlertCircle size={18} />
+            <p className="text-xs text-center">{error}</p>
+          </div>
+        )}
+
         {quote && !loading && (
           <>
-            <p className="text-white text-sm leading-relaxed italic flex-1">"{quote.text}"</p>
-            <p className="text-emerald-300/80 text-xs">— {quote.author}</p>
+            <p className="text-white/95 text-sm leading-relaxed italic flex-1">"{quote.text}"</p>
+            <p className="text-emerald-200/85 text-xs">— {quote.author}</p>
           </>
         )}
       </div>
 
       <button
         onClick={handleNew}
-        className="flex items-center gap-2 text-white/40 hover:text-emerald-300 transition-colors text-xs self-end"
+        disabled={spinning}
+        className="flex items-center gap-1.5 text-white/40 hover:text-emerald-200 disabled:opacity-50 transition-colors text-[11px] uppercase tracking-wider self-end"
       >
-        <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
-        New quote
+        <RefreshCw size={11} className={spinning ? 'animate-spin' : ''} />
+        New
       </button>
     </div>
   );

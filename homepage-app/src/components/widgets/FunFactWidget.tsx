@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { Zap, RefreshCw, AlertCircle } from 'lucide-react';
 import { useFunFact } from '../../hooks/useFunFact';
 
 export default function FunFactWidget() {
@@ -12,16 +12,20 @@ export default function FunFactWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Zap size={16} className="text-amber-300" />
-          <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Fun Fact</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-amber-500/20 ring-1 ring-amber-300/20 flex items-center justify-center">
+            <Zap size={13} className="text-amber-200" />
+          </div>
+          <span className="text-white/70 text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase">
+            Fun Fact
+          </span>
         </div>
-        <span className="flex items-center gap-1 text-xs text-amber-300/80 bg-amber-500/15 px-2 py-0.5 rounded-full">
-          <Sparkles size={10} />
-          Live
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-300 pulse-soft" />
+          <span className="text-amber-200/80 text-[10px] uppercase tracking-wider">Live</span>
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
@@ -35,25 +39,26 @@ export default function FunFactWidget() {
 
         {error && !loading && (
           <div className="flex flex-col items-center justify-center flex-1 gap-2 text-white/40">
-            <AlertCircle size={20} />
+            <AlertCircle size={18} />
             <p className="text-xs text-center">{error}</p>
           </div>
         )}
 
         {fact && !loading && (
           <>
-            <span className="text-3xl">💡</span>
-            <p className="text-white text-sm leading-relaxed">{fact.text}</p>
+            <span className="text-2xl">💡</span>
+            <p className="text-white/95 text-sm leading-relaxed">{fact.text}</p>
           </>
         )}
       </div>
 
       <button
         onClick={handleAnother}
-        className="flex items-center gap-2 text-white/40 hover:text-amber-300 transition-colors text-xs self-end"
+        disabled={spinning}
+        className="flex items-center gap-1.5 text-white/40 hover:text-amber-200 disabled:opacity-50 transition-colors text-[11px] uppercase tracking-wider self-end"
       >
-        <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
-        Another one
+        <RefreshCw size={11} className={spinning ? 'animate-spin' : ''} />
+        Another
       </button>
     </div>
   );

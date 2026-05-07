@@ -21,8 +21,7 @@
 
 @layer utilities {
   /* --tint is set inline on <App> as space-separated RGB (e.g. "120 90 140").
-     Modern rgb() syntax lets us combine it with an alpha. Falls back to a
-     neutral grey if the variable is missing. */
+     Modern rgb() syntax lets us combine it with an alpha. */
 
   .glass {
     background: rgb(var(--tint, 255 255 255) / 0.14);
@@ -44,5 +43,35 @@
 
   .widget-shadow {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Subtle interactive lift for widget cards */
+  .widget-hover {
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                border-color 0.35s ease;
+  }
+  .widget-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
+    border-color: rgb(var(--tint, 255 255 255) / 0.30);
+  }
+
+  /* Staggered entrance for widgets */
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .rise-in {
+    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Soft live pulse for status dots */
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.55; transform: scale(1);   }
+    50%      { opacity: 1;    transform: scale(1.15); }
+  }
+  .pulse-soft {
+    animation: pulse-soft 2.4s ease-in-out infinite;
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, AlertCircle, RefreshCw } from 'lucide-react';
 import { useWordOfDay } from '../../hooks/useWordOfDay';
 
 function Skeleton() {
@@ -24,19 +24,24 @@ export default function VocabWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
+      {/* Header — icon in tinted circle + label + live dot */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <BookOpen size={16} className="text-violet-300" />
-          <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Word of the Day</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-violet-500/20 ring-1 ring-violet-300/20 flex items-center justify-center">
+            <BookOpen size={13} className="text-violet-200" />
+          </div>
+          <span className="text-white/70 text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase">
+            Word of the Day
+          </span>
         </div>
-        <span className="flex items-center gap-1 text-xs text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded-full">
-          <Sparkles size={10} />
-          Live
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-violet-300 pulse-soft" />
+          <span className="text-violet-200/80 text-[10px] uppercase tracking-wider">Live</span>
+        </div>
       </div>
 
-      {/* Inline error toast — visible even if cached word is showing */}
+      {/* Inline error toast */}
       {error && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/15 border border-red-400/20">
           <AlertCircle size={14} className="text-red-300 shrink-0" />
@@ -45,7 +50,6 @@ export default function VocabWidget() {
       )}
 
       {loading && <Skeleton />}
-
       {!loading && !data && !error && <Skeleton />}
 
       {!loading && !data && error && (
@@ -75,23 +79,23 @@ export default function VocabWidget() {
                 className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <p className="text-2xl font-semibold text-white capitalize">{data.word}</p>
+                <p className="text-2xl font-semibold text-white capitalize tracking-tight">{data.word}</p>
                 {data.phonetic && <p className="text-white/50 text-sm font-mono">{data.phonetic}</p>}
-                <span className="text-xs text-violet-300/70 italic">{data.partOfSpeech}</span>
-                <p className="text-white/25 text-xs mt-2">Tap to reveal meaning</p>
+                <span className="text-[10px] text-violet-200/70 italic uppercase tracking-wider">{data.partOfSpeech}</span>
+                <p className="text-white/25 text-[10px] mt-2 uppercase tracking-wider">Tap to reveal</p>
               </div>
 
               {/* Back */}
               <div
-                className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-500/20 p-4"
+                className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-400/20 p-4"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <p className="text-white text-sm leading-relaxed">{data.meaning}</p>
                 {data.example && (
-                  <p className="text-white/50 text-xs italic">"{data.example}"</p>
+                  <p className="text-white/55 text-xs italic">"{data.example}"</p>
                 )}
                 {data.origin && (
-                  <p className="text-violet-300/60 text-xs">Origin: {data.origin}</p>
+                  <p className="text-violet-200/60 text-[10px] uppercase tracking-wider">Origin · {data.origin}</p>
                 )}
               </div>
             </div>
@@ -100,10 +104,10 @@ export default function VocabWidget() {
           <button
             onClick={handleChange}
             disabled={spinning}
-            className="flex items-center gap-2 text-white/40 hover:text-violet-300 disabled:opacity-50 transition-colors text-xs self-end"
+            className="flex items-center gap-1.5 text-white/40 hover:text-violet-200 disabled:opacity-50 transition-colors text-[11px] uppercase tracking-wider self-end"
           >
-            <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
-            {spinning ? 'Loading…' : 'Change word'}
+            <RefreshCw size={11} className={spinning ? 'animate-spin' : ''} />
+            {spinning ? 'Loading' : 'Change'}
           </button>
         </>
       )}
