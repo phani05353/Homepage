@@ -38,7 +38,8 @@ export default function VocabWidget() {
 
       {loading && <Skeleton />}
 
-      {error && !loading && (
+      {/* Error block: only show if we have NO cached word to fall back on. */}
+      {error && !loading && !data && (
         <div className="flex flex-col items-center justify-center flex-1 gap-2 text-white/40">
           <AlertCircle size={20} />
           <p className="text-xs text-center">{error}</p>

@@ -26,8 +26,9 @@ export default function App() {
         backgroundColor: '#0f0f1a',
       }}
     >
-      {/* Gradient overlay for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/15 to-black/55 pointer-events-none" />
+      {/* Darken overlay — uniform dim + soft top/bottom gradient for legibility */}
+      <div className="absolute inset-0 bg-black/35 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50 pointer-events-none" />
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-8 pt-6">

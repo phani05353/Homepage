@@ -27,21 +27,30 @@ export default function Clock() {
   return (
     <div className="select-none flex flex-col items-center gap-4 sm:gap-5">
       {/* Greeting */}
-      <p className="text-white/60 text-xs sm:text-sm font-medium tracking-[0.4em] uppercase">
+      <p
+        className="text-white/65"
+        style={{
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: 'clamp(0.7rem, 1.1vw, 0.85rem)',
+          fontWeight: 500,
+          letterSpacing: '0.4em',
+          textTransform: 'uppercase',
+        }}
+      >
         {emoji}&nbsp;&nbsp;{greeting}
       </p>
 
-      {/* Time — single string, proper colon, light weight */}
+      {/* Time — Inter, weight 500, big and present */}
       <div
         className="text-white"
         style={{
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
-          fontSize: 'clamp(5rem, 16vw, 10rem)',
-          fontWeight: 300,
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: 'clamp(5rem, 15vw, 10rem)',
+          fontWeight: 500,
           fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.05em',
-          lineHeight: 1,
-          textShadow: '0 4px 30px rgba(0,0,0,0.55), 0 0 80px rgba(0,0,0,0.2)',
+          letterSpacing: '-0.04em',
+          lineHeight: 0.95,
+          textShadow: '0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(0,0,0,0.3)',
         }}
       >
         {hh}:{mm}
@@ -49,8 +58,14 @@ export default function Clock() {
 
       {/* Date */}
       <p
-        className="font-light text-white/55 uppercase"
-        style={{ fontSize: 'clamp(0.7rem, 1.2vw, 0.85rem)', letterSpacing: '0.3em' }}
+        className="text-white/60"
+        style={{
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: 'clamp(0.7rem, 1.15vw, 0.85rem)',
+          fontWeight: 400,
+          letterSpacing: '0.32em',
+          textTransform: 'uppercase',
+        }}
       >
         {date}
       </p>
