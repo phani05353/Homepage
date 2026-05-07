@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getTodayWord, WORD_LIST } from '../data/wordlist';
 
 export interface WordOfDay {
   word: string;
@@ -10,17 +9,23 @@ export interface WordOfDay {
   origin?: string;
 }
 
-const CACHE_KEY = `hw_word_${new Date().toDateString()}`;
-const DICT_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+// All endpoints below send `Access-Control-Allow-Origin: *` — they work directly
+// from the browser, no proxy required.
+const RANDOM_WORD = 'https://random-word-api.herokuapp.com/word?number=20';
+const DICT_URL    = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+const CACHE_KEY   = `hw_word_${new Date().toDateString()}`;
 
-async function fetchDefinition(word: string): Promise<WordOfDay> {
-  const defs = await fetch(`${DICT_URL}${word}`).then((r) => r.json());
-  if (!Array.isArray(defs) || !defs[0]) throw new Error('no entry');
+async function fetchDefinition(word: string): Promise<WordOfDay | null> {
+  const res = await fetch(`${DICT_URL}${word}`);
+  if (!res.ok) return null;
+
+  const defs = await res.json();
+  if (!Array.isArray(defs) || !defs[0]) return null;
 
   const entry = defs[0];
   const meaning = entry.meanings?.[0];
   const def = meaning?.definitions?.[0];
-  if (!meaning || !def) throw new Error('no definition');
+  if (!meaning || !def) return null;
 
   return {
     word: entry.word,
@@ -32,46 +37,39 @@ async function fetchDefinition(word: string): Promise<WordOfDay> {
   };
 }
 
-async function findValidWord(startWord?: string): Promise<WordOfDay> {
-  const dayIndex = Math.floor(Date.now() / 86400000);
-  // Try today's word first, then walk forward through the list until one resolves
-  const candidates = startWord
-    ? [startWord]
-    : Array.from({ length: 5 }, (_, i) => WORD_LIST[(dayIndex + i) % WORD_LIST.length]);
+async function findGoodWord(): Promise<WordOfDay> {
+  const words: string[] = await fetch(RANDOM_WORD).then((r) => r.json());
+
+  // Filter for sophisticated-looking words (length 6+, no hyphens)
+  const candidates = words.filter((w) => w.length >= 6 && /^[a-z]+$/i.test(w));
 
   for (const word of candidates) {
-    try {
-      return await fetchDefinition(word);
-    } catch {
-      continue;
-    }
+    const result = await fetchDefinition(word);
+    if (result) return result;
   }
-  throw new Error('no valid word');
+  throw new Error('no word with definition found');
 }
 
 export function useWordOfDay() {
-  const [data, setData] = useState<WordOfDay | null>(null);
+  const [data, setData]       = useState<WordOfDay | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
-  const load = async (fresh = false) => {
+  const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      if (!fresh) {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          setData(JSON.parse(cached));
-          setLoading(false);
-          return;
-        }
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        setData(JSON.parse(cached));
+        setLoading(false);
+        return;
       }
-      const word = fresh ? undefined : getTodayWord();
-      const result = await findValidWord(word);
-      if (!fresh) localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+      const result = await findGoodWord();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(result));
       setData(result);
     } catch {
-      setError('Definition unavailable — try again later');
+      setError('Live word lookup failed — refresh in a moment');
     } finally {
       setLoading(false);
     }
@@ -79,5 +77,5 @@ export function useWordOfDay() {
 
   useEffect(() => { load(); }, []);
 
-  return { data, loading, error, refresh: () => load(true) };
+  return { data, loading, error };
 }

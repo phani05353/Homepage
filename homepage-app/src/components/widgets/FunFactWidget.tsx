@@ -1,18 +1,9 @@
 import { useState } from 'react';
-import { Zap, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Zap, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
 import { useFunFact } from '../../hooks/useFunFact';
 
-function isSafeUrl(url: string): boolean {
-  try {
-    const { protocol } = new URL(url);
-    return protocol === 'http:' || protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 export default function FunFactWidget() {
-  const { fact, loading, isLive, fetchAnother } = useFunFact();
+  const { fact, loading, error, fetchAnother } = useFunFact();
   const [spinning, setSpinning] = useState(false);
 
   const handleAnother = () => {
@@ -27,12 +18,10 @@ export default function FunFactWidget() {
           <Zap size={16} className="text-amber-300" />
           <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Fun Fact</span>
         </div>
-        {!loading && (
-          <span className="flex items-center gap-1 text-xs text-amber-300/70 bg-amber-500/15 px-2 py-0.5 rounded-full">
-            {isLive ? <Wifi size={10} /> : <WifiOff size={10} />}
-            {isLive ? 'Live' : 'Today'}
-          </span>
-        )}
+        <span className="flex items-center gap-1 text-xs text-amber-300/80 bg-amber-500/15 px-2 py-0.5 rounded-full">
+          <Sparkles size={10} />
+          Live
+        </span>
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
@@ -43,22 +32,26 @@ export default function FunFactWidget() {
             <div className="h-4 w-3/5 bg-white/10 rounded" />
           </div>
         )}
+
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center flex-1 gap-2 text-white/40">
+            <AlertCircle size={20} />
+            <p className="text-xs text-center">{error}</p>
+          </div>
+        )}
+
         {fact && !loading && (
           <>
             <span className="text-3xl">💡</span>
             <p className="text-white text-sm leading-relaxed">{fact.text}</p>
-            {fact.sourceUrl && isSafeUrl(fact.sourceUrl) && (
-              <a href={fact.sourceUrl} target="_blank" rel="noopener noreferrer"
-                className="text-amber-300/50 text-xs hover:text-amber-300/80 transition-colors">
-                Source ↗
-              </a>
-            )}
           </>
         )}
       </div>
 
-      <button onClick={handleAnother}
-        className="flex items-center gap-2 text-white/40 hover:text-amber-300 transition-colors text-xs self-end">
+      <button
+        onClick={handleAnother}
+        className="flex items-center gap-2 text-white/40 hover:text-amber-300 transition-colors text-xs self-end"
+      >
         <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
         Another one
       </button>
