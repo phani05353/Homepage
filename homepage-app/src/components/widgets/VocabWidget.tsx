@@ -36,65 +36,75 @@ export default function VocabWidget() {
         </span>
       </div>
 
+      {/* Inline error toast — visible even if cached word is showing */}
+      {error && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/15 border border-red-400/20">
+          <AlertCircle size={14} className="text-red-300 shrink-0" />
+          <p className="text-red-200/90 text-xs leading-tight">{error}</p>
+        </div>
+      )}
+
       {loading && <Skeleton />}
 
-      {/* Error block: only show if we have NO cached word to fall back on. */}
-      {error && !loading && !data && (
+      {!loading && !data && !error && <Skeleton />}
+
+      {!loading && !data && error && (
         <div className="flex flex-col items-center justify-center flex-1 gap-2 text-white/40">
           <AlertCircle size={20} />
-          <p className="text-xs text-center">{error}</p>
+          <p className="text-xs text-center">No cached word available</p>
         </div>
       )}
 
       {data && !loading && (
         <>
-        <div
-          className="relative flex-1 cursor-pointer"
-          style={{ perspective: '1000px', minHeight: 140 }}
-          onClick={() => setFlipped((f) => !f)}
-        >
           <div
-            className="w-full h-full transition-all duration-500"
-            style={{
-              transformStyle: 'preserve-3d',
-              transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-              minHeight: 140,
-            }}
+            className="relative flex-1 cursor-pointer"
+            style={{ perspective: '1000px', minHeight: 140 }}
+            onClick={() => setFlipped((f) => !f)}
           >
-            {/* Front */}
             <div
-              className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
-              style={{ backfaceVisibility: 'hidden' }}
+              className="w-full h-full transition-all duration-500"
+              style={{
+                transformStyle: 'preserve-3d',
+                transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                minHeight: 140,
+              }}
             >
-              <p className="text-2xl font-semibold text-white capitalize">{data.word}</p>
-              {data.phonetic && <p className="text-white/50 text-sm font-mono">{data.phonetic}</p>}
-              <span className="text-xs text-violet-300/70 italic">{data.partOfSpeech}</span>
-              <p className="text-white/25 text-xs mt-2">Tap to reveal meaning</p>
-            </div>
+              {/* Front */}
+              <div
+                className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
+                <p className="text-2xl font-semibold text-white capitalize">{data.word}</p>
+                {data.phonetic && <p className="text-white/50 text-sm font-mono">{data.phonetic}</p>}
+                <span className="text-xs text-violet-300/70 italic">{data.partOfSpeech}</span>
+                <p className="text-white/25 text-xs mt-2">Tap to reveal meaning</p>
+              </div>
 
-            {/* Back */}
-            <div
-              className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-500/20 p-4"
-              style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-            >
-              <p className="text-white text-sm leading-relaxed">{data.meaning}</p>
-              {data.example && (
-                <p className="text-white/50 text-xs italic">"{data.example}"</p>
-              )}
-              {data.origin && (
-                <p className="text-violet-300/60 text-xs">Origin: {data.origin}</p>
-              )}
+              {/* Back */}
+              <div
+                className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-500/20 p-4"
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
+                <p className="text-white text-sm leading-relaxed">{data.meaning}</p>
+                {data.example && (
+                  <p className="text-white/50 text-xs italic">"{data.example}"</p>
+                )}
+                {data.origin && (
+                  <p className="text-violet-300/60 text-xs">Origin: {data.origin}</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={handleChange}
-          className="flex items-center gap-2 text-white/40 hover:text-violet-300 transition-colors text-xs self-end"
-        >
-          <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
-          Change word
-        </button>
+          <button
+            onClick={handleChange}
+            disabled={spinning}
+            className="flex items-center gap-2 text-white/40 hover:text-violet-300 disabled:opacity-50 transition-colors text-xs self-end"
+          >
+            <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
+            {spinning ? 'Loading…' : 'Change word'}
+          </button>
         </>
       )}
     </div>

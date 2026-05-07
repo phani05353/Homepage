@@ -9,38 +9,48 @@ export interface WordOfDay {
   origin?: string;
 }
 
-// All endpoints below send `Access-Control-Allow-Origin: *` — they work
-// directly from the browser, no proxy required.
 const DICT_URL  = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 const CACHE_KEY = `hw_word_${new Date().toDateString()}`;
 
-// Rotating Datamuse topics give us thematic-but-varied vocabulary each day
-// without ever repeating the same fetch.
-const TOPICS = [
-  'wisdom',     'success',    'knowledge',   'curiosity',  'creativity',
-  'philosophy', 'literature',  'language',    'art',        'history',
-  'psychology', 'culture',    'innovation',  'leadership', 'discovery',
-  'science',    'technology', 'beauty',      'reflection', 'understanding',
+// Datamuse seeds — rotated to keep results varied across days/clicks.
+const SEED_TOPICS = [
+  'wisdom', 'curiosity', 'creativity', 'philosophy', 'discovery',
+  'knowledge', 'literature', 'art', 'science', 'culture',
+];
+const SEED_WORDS = [
+  'intelligent', 'eloquent', 'pragmatic', 'thoughtful', 'meticulous',
+  'curious', 'wise', 'discerning', 'astute', 'resilient',
 ];
 
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 async function fetchCandidates(): Promise<string[]> {
-  const dayIndex = Math.floor(Date.now() / 86400000);
-  const topic = TOPICS[dayIndex % TOPICS.length];
-  const url = `https://api.datamuse.com/words?topics=${topic}&max=200`;
+  // Pick a random Datamuse strategy each call so Change-word actually changes things.
+  const strategies = [
+    `topics=${pick(SEED_TOPICS)}`,
+    `ml=${pick(SEED_WORDS)}`,
+    `rel_syn=${pick(SEED_WORDS)}`,
+  ];
+  const url = `https://api.datamuse.com/words?${pick(strategies)}&max=200`;
 
-  const data: Array<{ word: string }> = await fetch(url).then((r) => r.json());
+  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!res.ok) throw new Error(`Datamuse ${res.status}`);
 
-  // Filter for sophisticated single-token words (6+ chars, lowercase letters only)
-  // and shuffle so the same topic still yields variety
-  return data
+  const data: Array<{ word: string }> = await res.json();
+  const filtered = data
     .map((w) => w.word)
     .filter((w) => w.length >= 6 && /^[a-z]+$/.test(w))
     .sort(() => Math.random() - 0.5)
     .slice(0, 30);
+
+  if (filtered.length === 0) throw new Error('Datamuse returned no usable words');
+  return filtered;
 }
 
 async function fetchDefinition(word: string): Promise<WordOfDay | null> {
-  const res = await fetch(`${DICT_URL}${word}`);
+  const res = await fetch(`${DICT_URL}${word}`, { signal: AbortSignal.timeout(5000) });
   if (!res.ok) return null;
 
   const defs = await res.json();
@@ -63,12 +73,11 @@ async function fetchDefinition(word: string): Promise<WordOfDay | null> {
 
 async function findGoodWord(): Promise<WordOfDay> {
   const candidates = await fetchCandidates();
-
   for (const word of candidates) {
     const result = await fetchDefinition(word);
     if (result) return result;
   }
-  throw new Error('no word with definition found');
+  throw new Error('Dictionary lookup failed for all candidates');
 }
 
 export function useWordOfDay() {
@@ -77,22 +86,38 @@ export function useWordOfDay() {
   const [error, setError]     = useState<string | null>(null);
 
   const load = async (fresh = false) => {
-    setLoading(true);
     setError(null);
-    try {
-      if (!fresh) {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
+
+    if (!fresh) {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
           setData(JSON.parse(cached));
           setLoading(false);
           return;
+        } catch {
+          // bad cache, fall through to live fetch
         }
       }
+    }
+
+    setLoading(true);
+    if (fresh) setData(null); // Clear so user sees skeleton while we fetch fresh
+
+    try {
       const result = await findGoodWord();
       localStorage.setItem(CACHE_KEY, JSON.stringify(result));
       setData(result);
-    } catch {
-      setError('Live word lookup failed — refresh in a moment');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'unknown error';
+      setError(`Lookup failed: ${msg}`);
+      // On a fresh-fetch failure, restore the previous cached word if any
+      if (fresh) {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          try { setData(JSON.parse(cached)); } catch { /* ignore */ }
+        }
+      }
     } finally {
       setLoading(false);
     }
