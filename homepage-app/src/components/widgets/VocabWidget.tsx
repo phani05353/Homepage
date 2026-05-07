@@ -24,7 +24,7 @@ export default function VocabWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-3xl p-5 widget-shadow flex flex-col gap-4 min-h-[220px]">
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen size={16} className="text-violet-300" />

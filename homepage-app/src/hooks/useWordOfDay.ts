@@ -27,26 +27,36 @@ function pick<T>(arr: T[]): T {
 }
 
 async function fetchCandidates(): Promise<string[]> {
-  // Pick a random Datamuse strategy each call so Change-word actually changes things.
+  // Try multiple strategies in sequence — return as soon as one yields words.
+  // Order is randomised so Change-word actually changes things.
   const strategies = [
     `topics=${pick(SEED_TOPICS)}`,
     `ml=${pick(SEED_WORDS)}`,
     `rel_syn=${pick(SEED_WORDS)}`,
-  ];
-  const url = `https://api.datamuse.com/words?${pick(strategies)}&max=200`;
+    `topics=${pick(SEED_TOPICS)}`,
+    `ml=intelligent`, // fallback known-good
+  ].sort(() => Math.random() - 0.5);
 
-  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-  if (!res.ok) throw new Error(`Datamuse ${res.status}`);
+  for (const strategy of strategies) {
+    try {
+      const url = `https://api.datamuse.com/words?${strategy}&max=200`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      if (!res.ok) continue;
 
-  const data: Array<{ word: string }> = await res.json();
-  const filtered = data
-    .map((w) => w.word)
-    .filter((w) => w.length >= 6 && /^[a-z]+$/.test(w))
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 30);
+      const data: Array<{ word: string }> = await res.json();
+      const filtered = data
+        .map((w) => w.word)
+        .filter((w) => w.length >= 5 && /^[a-z]+$/.test(w))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 40);
 
-  if (filtered.length === 0) throw new Error('Datamuse returned no usable words');
-  return filtered;
+      if (filtered.length >= 5) return filtered;
+    } catch {
+      // try next strategy
+    }
+  }
+
+  throw new Error('Datamuse returned no usable words across all strategies');
 }
 
 async function fetchDefinition(word: string): Promise<WordOfDay | null> {

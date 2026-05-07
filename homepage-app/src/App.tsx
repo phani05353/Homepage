@@ -31,19 +31,19 @@ export default function App() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50 pointer-events-none" />
 
       {/* Top bar */}
-      <header className="relative z-10 flex items-center justify-between px-8 pt-6">
+      <header className="relative z-10 flex items-center justify-between gap-3 px-4 sm:px-8 pt-4 sm:pt-6">
         <WeatherBar />
         <SearchBar />
       </header>
 
       {/* Center — clock */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center gap-2 px-8 pb-8">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center gap-2 px-4 sm:px-8 py-8 sm:py-12">
         <Clock />
       </main>
 
       {/* Widget row */}
-      <section className="relative z-10 px-8 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto">
+      <section className="relative z-10 px-4 sm:px-8 pb-6 sm:pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto">
           <VocabWidget />
           <FunFactWidget />
           <QuoteWidget />

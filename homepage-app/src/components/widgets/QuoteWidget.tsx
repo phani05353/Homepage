@@ -22,7 +22,7 @@ export default function QuoteWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-3xl p-5 widget-shadow flex flex-col gap-4 min-h-[220px]">
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
       <div className="flex items-center gap-2">
         <Quote size={16} className="text-emerald-300" />
         <span className="text-white/60 text-xs font-medium tracking-widest uppercase">Quote of the Day</span>

@@ -30,7 +30,7 @@ export default function SearchBar() {
     <div className="flex items-center justify-end">
       <div
         className={`flex items-center glass rounded-full transition-all duration-300 ease-in-out overflow-hidden ${
-          expanded ? 'w-72 px-4 py-2.5' : 'w-10 h-10 cursor-pointer hover:bg-white/15'
+          expanded ? 'w-48 sm:w-72 px-3 sm:px-4 py-2 sm:py-2.5' : 'w-10 h-10 cursor-pointer hover:bg-white/15'
         }`}
         onClick={!expanded ? () => setExpanded(true) : undefined}
       >
