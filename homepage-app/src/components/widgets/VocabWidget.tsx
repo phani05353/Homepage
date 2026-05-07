@@ -74,28 +74,28 @@ export default function VocabWidget() {
                 minHeight: 140,
               }}
             >
-              {/* Front */}
+              {/* Front — flat, no inner card surface, matches other widgets */}
               <div
-                className="absolute inset-0 flex flex-col justify-center items-center gap-2 rounded-2xl bg-white/5 border border-white/10 p-4"
+                className="absolute inset-0 flex flex-col justify-center items-center gap-1.5"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <p className="text-2xl font-semibold text-white capitalize tracking-tight">{data.word}</p>
-                {data.phonetic && <p className="text-white/50 text-sm font-mono">{data.phonetic}</p>}
-                <span className="text-[10px] text-violet-200/70 italic uppercase tracking-wider">{data.partOfSpeech}</span>
-                <p className="text-white/25 text-[10px] mt-2 uppercase tracking-wider">Tap to reveal</p>
+                <p className="text-3xl font-semibold text-white capitalize tracking-tight">{data.word}</p>
+                {data.phonetic && <p className="text-white/55 text-sm font-mono">{data.phonetic}</p>}
+                <span className="text-[10px] text-violet-200/75 italic uppercase tracking-[0.18em] mt-0.5">{data.partOfSpeech}</span>
+                <p className="text-white/30 text-[10px] mt-2 uppercase tracking-[0.18em]">Tap to reveal</p>
               </div>
 
-              {/* Back */}
+              {/* Back — subtly elevated to signal the reveal state */}
               <div
-                className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl bg-violet-900/30 border border-violet-400/20 p-4"
+                className="absolute inset-0 flex flex-col justify-center gap-2.5 rounded-xl bg-violet-500/10 border border-violet-300/15 px-3 py-3"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <p className="text-white text-sm leading-relaxed">{data.meaning}</p>
+                <p className="text-white/95 text-sm leading-relaxed">{data.meaning}</p>
                 {data.example && (
                   <p className="text-white/55 text-xs italic">"{data.example}"</p>
                 )}
                 {data.origin && (
-                  <p className="text-violet-200/60 text-[10px] uppercase tracking-wider">Origin · {data.origin}</p>
+                  <p className="text-violet-200/65 text-[10px] uppercase tracking-[0.18em]">Origin · {data.origin}</p>
                 )}
               </div>
             </div>
