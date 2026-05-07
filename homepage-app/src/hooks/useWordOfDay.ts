@@ -9,11 +9,35 @@ export interface WordOfDay {
   origin?: string;
 }
 
-// All endpoints below send `Access-Control-Allow-Origin: *` — they work directly
-// from the browser, no proxy required.
-const RANDOM_WORD = 'https://random-word-api.herokuapp.com/word?number=20';
-const DICT_URL    = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
-const CACHE_KEY   = `hw_word_${new Date().toDateString()}`;
+// All endpoints below send `Access-Control-Allow-Origin: *` — they work
+// directly from the browser, no proxy required.
+const DICT_URL  = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+const CACHE_KEY = `hw_word_${new Date().toDateString()}`;
+
+// Rotating Datamuse topics give us thematic-but-varied vocabulary each day
+// without ever repeating the same fetch.
+const TOPICS = [
+  'wisdom',     'success',    'knowledge',   'curiosity',  'creativity',
+  'philosophy', 'literature',  'language',    'art',        'history',
+  'psychology', 'culture',    'innovation',  'leadership', 'discovery',
+  'science',    'technology', 'beauty',      'reflection', 'understanding',
+];
+
+async function fetchCandidates(): Promise<string[]> {
+  const dayIndex = Math.floor(Date.now() / 86400000);
+  const topic = TOPICS[dayIndex % TOPICS.length];
+  const url = `https://api.datamuse.com/words?topics=${topic}&max=200`;
+
+  const data: Array<{ word: string }> = await fetch(url).then((r) => r.json());
+
+  // Filter for sophisticated single-token words (6+ chars, lowercase letters only)
+  // and shuffle so the same topic still yields variety
+  return data
+    .map((w) => w.word)
+    .filter((w) => w.length >= 6 && /^[a-z]+$/.test(w))
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 30);
+}
 
 async function fetchDefinition(word: string): Promise<WordOfDay | null> {
   const res = await fetch(`${DICT_URL}${word}`);
@@ -38,10 +62,7 @@ async function fetchDefinition(word: string): Promise<WordOfDay | null> {
 }
 
 async function findGoodWord(): Promise<WordOfDay> {
-  const words: string[] = await fetch(RANDOM_WORD).then((r) => r.json());
-
-  // Filter for sophisticated-looking words (length 6+, no hyphens)
-  const candidates = words.filter((w) => w.length >= 6 && /^[a-z]+$/i.test(w));
+  const candidates = await fetchCandidates();
 
   for (const word of candidates) {
     const result = await fetchDefinition(word);
