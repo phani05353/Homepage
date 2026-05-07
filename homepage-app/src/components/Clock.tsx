@@ -45,7 +45,7 @@ export default function Clock() {
         className="text-white"
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 'clamp(5rem, 15vw, 10rem)',
+          fontSize: 'clamp(3.5rem, 10vw, 7rem)',
           fontWeight: 200,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.04em',
