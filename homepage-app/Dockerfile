@@ -6,15 +6,19 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM nginx:alpine AS runner
 
-WORKDIR /app
-COPY --from=builder /app/dist /app/dist
-COPY server.js /app/server.js
+# curl is ~1MB but its exit codes and flags are predictable. BusyBox wget's
+# `--spider` was returning non-zero even on success in some Alpine builds.
+RUN apk add --no-cache curl
 
-# Node-based healthcheck — no extra packages, uses the runtime's own stdlib.
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Probe /health — Portainer surfaces this status on the container card.
+# -f fails on 4xx/5xx, -s silent, -S still shows real errors.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+  CMD curl -fsS http://127.0.0.1/health || exit 1
 
-EXPOSE 3000
-CMD ["node", "server.js"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
