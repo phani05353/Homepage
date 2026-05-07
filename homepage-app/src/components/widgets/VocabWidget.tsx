@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Sparkles, AlertCircle } from 'lucide-react';
+import { BookOpen, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 import { useWordOfDay } from '../../hooks/useWordOfDay';
 
 function Skeleton() {
@@ -13,8 +13,15 @@ function Skeleton() {
 }
 
 export default function VocabWidget() {
-  const { data, loading, error } = useWordOfDay();
+  const { data, loading, error, changeWord } = useWordOfDay();
   const [flipped, setFlipped] = useState(false);
+  const [spinning, setSpinning] = useState(false);
+
+  const handleChange = () => {
+    setSpinning(true);
+    setFlipped(false);
+    changeWord().then(() => setSpinning(false));
+  };
 
   return (
     <div className="glass-dark rounded-3xl p-5 widget-shadow flex flex-col gap-4 min-h-[220px]">
@@ -39,6 +46,7 @@ export default function VocabWidget() {
       )}
 
       {data && !loading && (
+        <>
         <div
           className="relative flex-1 cursor-pointer"
           style={{ perspective: '1000px', minHeight: 140 }}
@@ -78,6 +86,15 @@ export default function VocabWidget() {
             </div>
           </div>
         </div>
+
+        <button
+          onClick={handleChange}
+          className="flex items-center gap-2 text-white/40 hover:text-violet-300 transition-colors text-xs self-end"
+        >
+          <RefreshCw size={13} className={spinning ? 'animate-spin' : ''} />
+          Change word
+        </button>
+        </>
       )}
     </div>
   );

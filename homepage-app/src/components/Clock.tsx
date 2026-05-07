@@ -9,7 +9,7 @@ function getGreeting(h: number) {
 }
 
 export default function Clock() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime]   = useState(new Date());
   const [blink, setBlink] = useState(true);
 
   useEffect(() => {
@@ -23,88 +23,73 @@ export default function Clock() {
   const h  = time.getHours();
   const hh = h.toString().padStart(2, '0');
   const mm = time.getMinutes().toString().padStart(2, '0');
-  const ss = time.getSeconds().toString().padStart(2, '0');
   const { text: greeting, emoji } = getGreeting(h);
-
   const date = time.toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   });
 
-  return (
-    <div className="select-none flex flex-col items-center" style={{ gap: '0.6rem' }}>
+  // Single source of truth for the digit size so the dot separator scales with it
+  const digitSize = 'clamp(5rem, 15vw, 9.5rem)';
+  const digitShadow = '0 4px 32px rgba(0,0,0,0.45), 0 0 60px rgba(0,0,0,0.25)';
 
-      {/* Greeting pill */}
-      <p className="text-white/45 text-xs font-medium tracking-[0.5em] uppercase">
-        {emoji} &nbsp;{greeting}
+  return (
+    <div className="select-none flex flex-col items-center gap-4 sm:gap-6">
+      {/* Greeting */}
+      <p className="text-white/60 text-xs sm:text-sm font-medium tracking-[0.45em] uppercase">
+        {emoji}&nbsp;&nbsp;{greeting}
       </p>
 
-      {/* Time */}
-      <div className="flex items-baseline" style={{ gap: 0 }}>
-        {/* Hours */}
+      {/* Time row */}
+      <div className="flex items-center gap-3 sm:gap-5">
         <span
-          className="font-thin text-white tabular-nums"
-          style={{
-            fontSize: 'clamp(4.5rem, 15vw, 9rem)',
-            lineHeight: 1,
-            letterSpacing: '-0.03em',
-            textShadow: '0 2px 40px rgba(0,0,0,0.55)',
-          }}
+          className="font-extralight text-white tabular-nums leading-none"
+          style={{ fontSize: digitSize, letterSpacing: '-0.04em', textShadow: digitShadow }}
         >
           {hh}
         </span>
 
-        {/* Blinking colon */}
-        <span
-          className="font-thin text-white tabular-nums"
-          style={{
-            fontSize: 'clamp(4rem, 13vw, 8rem)',
-            lineHeight: 1,
-            letterSpacing: 0,
-            opacity: blink ? 1 : 0.18,
-            transition: 'opacity 0.1s',
-            textShadow: '0 2px 40px rgba(0,0,0,0.55)',
-            padding: '0 0.15em',
-          }}
+        {/* Two-dot separator — scales with digit size, blinks together */}
+        <div
+          className="flex flex-col items-center justify-center"
+          style={{ height: digitSize, gap: '0.45em', fontSize: digitSize }}
         >
-          :
-        </span>
+          <span
+            className="block bg-white rounded-full"
+            style={{
+              width: '0.16em',
+              height: '0.16em',
+              opacity: blink ? 0.95 : 0.18,
+              transition: 'opacity 0.15s ease-out',
+              boxShadow: '0 0 24px rgba(255,255,255,0.35)',
+            }}
+          />
+          <span
+            className="block bg-white rounded-full"
+            style={{
+              width: '0.16em',
+              height: '0.16em',
+              opacity: blink ? 0.95 : 0.18,
+              transition: 'opacity 0.15s ease-out',
+              boxShadow: '0 0 24px rgba(255,255,255,0.35)',
+            }}
+          />
+        </div>
 
-        {/* Minutes */}
         <span
-          className="font-thin text-white tabular-nums"
-          style={{
-            fontSize: 'clamp(4.5rem, 15vw, 9rem)',
-            lineHeight: 1,
-            letterSpacing: '-0.03em',
-            textShadow: '0 2px 40px rgba(0,0,0,0.55)',
-          }}
+          className="font-extralight text-white tabular-nums leading-none"
+          style={{ fontSize: digitSize, letterSpacing: '-0.04em', textShadow: digitShadow }}
         >
           {mm}
-        </span>
-
-        {/* Seconds — superscript style */}
-        <span
-          className="font-light text-white/35 tabular-nums"
-          style={{
-            fontSize: 'clamp(1.1rem, 2.8vw, 1.9rem)',
-            lineHeight: 1,
-            alignSelf: 'flex-start',
-            marginTop: '0.5em',
-            marginLeft: '0.35em',
-          }}
-        >
-          {ss}
         </span>
       </div>
 
       {/* Date */}
       <p
-        className="font-light text-white/45 uppercase tracking-widest"
-        style={{ fontSize: 'clamp(0.6rem, 1.1vw, 0.78rem)', letterSpacing: '0.22em' }}
+        className="font-light text-white/55 uppercase"
+        style={{ fontSize: 'clamp(0.65rem, 1.2vw, 0.82rem)', letterSpacing: '0.32em' }}
       >
         {date}
       </p>
-
     </div>
   );
 }

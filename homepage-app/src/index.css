@@ -20,18 +20,22 @@
 }
 
 @layer utilities {
+  /* --tint is set inline on <App> as space-separated RGB (e.g. "120 90 140").
+     Modern rgb() syntax lets us combine it with an alpha. Falls back to a
+     neutral grey if the variable is missing. */
+
   .glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgb(var(--tint, 255 255 255) / 0.14);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgb(var(--tint, 255 255 255) / 0.22);
   }
 
   .glass-dark {
-    background: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgb(var(--tint, 0 0 0) / 0.32);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgb(var(--tint, 255 255 255) / 0.18);
   }
 
   .text-shadow {

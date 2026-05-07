@@ -55,15 +55,17 @@ export function useWordOfDay() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
 
-  const load = async () => {
+  const load = async (fresh = false) => {
     setLoading(true);
     setError(null);
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        setData(JSON.parse(cached));
-        setLoading(false);
-        return;
+      if (!fresh) {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          setData(JSON.parse(cached));
+          setLoading(false);
+          return;
+        }
       }
       const result = await findGoodWord();
       localStorage.setItem(CACHE_KEY, JSON.stringify(result));
@@ -77,5 +79,5 @@ export function useWordOfDay() {
 
   useEffect(() => { load(); }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, changeWord: () => load(true) };
 }

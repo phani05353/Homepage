@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useBackground } from './hooks/useBackground';
 import Clock from './components/Clock';
 import WeatherBar from './components/WeatherBar';
@@ -7,12 +8,16 @@ import FunFactWidget from './components/widgets/FunFactWidget';
 import QuoteWidget from './components/widgets/QuoteWidget';
 
 export default function App() {
-  const { bg, loaded } = useBackground();
+  const { bg, loaded, tint } = useBackground();
+
+  // Expose the sampled colour as a CSS variable so .glass / .glass-dark pick it up
+  const tintStyle = { '--tint': tint.join(' ') } as CSSProperties;
 
   return (
     <div
       className="min-h-screen w-full relative flex flex-col transition-opacity duration-1000"
       style={{
+        ...tintStyle,
         opacity: loaded ? 1 : 0,
         backgroundImage: bg ? `url(${bg})` : undefined,
         backgroundSize: 'cover',
@@ -21,8 +26,8 @@ export default function App() {
         backgroundColor: '#0f0f1a',
       }}
     >
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60 pointer-events-none" />
+      {/* Gradient overlay for legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/15 to-black/55 pointer-events-none" />
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-8 pt-6">
