@@ -24,7 +24,7 @@ export default function VocabWidget() {
   };
 
   return (
-    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px]">
+    <div className="glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 min-h-[200px] sm:min-h-[220px] h-full">
       {/* Header — icon in tinted circle + label + live dot */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -63,7 +63,7 @@ export default function VocabWidget() {
         <>
           <div
             className="relative flex-1 cursor-pointer"
-            style={{ perspective: '1000px', minHeight: 140 }}
+            style={{ perspective: '1000px', minHeight: 100 }}
             onClick={() => setFlipped((f) => !f)}
           >
             <div
@@ -71,7 +71,7 @@ export default function VocabWidget() {
               style={{
                 transformStyle: 'preserve-3d',
                 transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                minHeight: 140,
+                minHeight: 100,
               }}
             >
               {/* Front — flat, no inner card surface, matches other widgets */}
