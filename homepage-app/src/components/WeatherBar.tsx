@@ -30,7 +30,7 @@ export default function WeatherBar() {
       <div className="flex items-center gap-2">
         <span className="text-xl sm:text-2xl">{info.emoji}</span>
         <div>
-          <p className="text-white font-semibold text-base sm:text-lg leading-none">{weather.temp}°C</p>
+          <p className="text-white font-semibold text-base sm:text-lg leading-none">{weather.temp}°F</p>
           <p className="text-white/60 text-[10px] sm:text-xs mt-0.5">{info.label}</p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function WeatherBar() {
           </span>
           <span className="flex items-center gap-1">
             <Wind size={13} />
-            {weather.windspeed} km/h
+            {weather.windspeed} mph
           </span>
         </div>
 

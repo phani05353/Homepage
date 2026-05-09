@@ -15,11 +15,6 @@ function formatMs(ms: number | null | undefined): string {
   return `${ms.toFixed(ms < 10 ? 1 : 0)} ms`;
 }
 
-function formatLossRate(pct: number | null | undefined): string {
-  if (typeof pct !== 'number') return '—';
-  return `${pct.toFixed(pct < 1 ? 2 : 1)}%`;
-}
-
 function formatTimeAgo(ts: number): string {
   const diff = Date.now() - ts;
   if (diff < 60_000)        return 'just now';
@@ -96,9 +91,9 @@ export default function SpeedtestWidget() {
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-cyan-200/70 text-[10px] uppercase tracking-wider">Loss · Jitter</span>
+              <span className="text-cyan-200/70 text-[10px] uppercase tracking-wider">Jitter</span>
               <p className="text-white text-sm tabular-nums leading-tight">
-                {formatLossRate(display?.packetLoss)} · {formatMs(display?.jitter)}
+                {formatMs(display?.jitter)}
               </p>
             </div>
           </div>
