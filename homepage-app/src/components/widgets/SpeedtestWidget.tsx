@@ -1,20 +1,22 @@
 import { Gauge, Download, Upload, Activity, Play, Square, AlertCircle } from 'lucide-react';
 import { useSpeedtest } from '../../hooks/useSpeedtest';
 
-function formatSpeed(mbps: number | undefined): string {
-  if (mbps === undefined || mbps === 0) return '—';
+// Defensive: the engine occasionally hands back `null` even though its
+// TypeScript declarations say `number | undefined`. typeof catches both.
+function formatSpeed(mbps: number | null | undefined): string {
+  if (typeof mbps !== 'number' || mbps === 0) return '—';
   if (mbps < 1)   return `${(mbps * 1000).toFixed(0)} Kbps`;
   if (mbps < 100) return `${mbps.toFixed(1)} Mbps`;
   return `${mbps.toFixed(0)} Mbps`;
 }
 
-function formatMs(ms: number | undefined): string {
-  if (ms === undefined) return '—';
+function formatMs(ms: number | null | undefined): string {
+  if (typeof ms !== 'number') return '—';
   return `${ms.toFixed(ms < 10 ? 1 : 0)} ms`;
 }
 
-function formatLossRate(pct: number | undefined): string {
-  if (pct === undefined) return '—';
+function formatLossRate(pct: number | null | undefined): string {
+  if (typeof pct !== 'number') return '—';
   return `${pct.toFixed(pct < 1 ? 2 : 1)}%`;
 }
 

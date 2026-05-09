@@ -42,24 +42,29 @@ export function useSpeedtest() {
 
     engine.onResultsChange = () => {
       const s = engine.results.getSummary();
+      // Library types say `number | undefined` but it sometimes returns null.
+      // Normalise to undefined so render-time formatters stay happy.
+      const num = (v: number | null | undefined): number | undefined =>
+        typeof v === 'number' ? v : undefined;
       setProgress({
-        download:   s.download   !== undefined ? s.download / 1e6   : undefined,
-        upload:     s.upload     !== undefined ? s.upload / 1e6     : undefined,
-        latency:    s.latency,
-        jitter:     s.jitter,
-        packetLoss: s.packetLoss !== undefined ? s.packetLoss * 100 : undefined,
+        download:   num(s.download)   !== undefined ? (s.download   as number) / 1e6 : undefined,
+        upload:     num(s.upload)     !== undefined ? (s.upload     as number) / 1e6 : undefined,
+        latency:    num(s.latency),
+        jitter:     num(s.jitter),
+        packetLoss: num(s.packetLoss) !== undefined ? (s.packetLoss as number) * 100 : undefined,
       });
     };
 
     engine.onFinish = (results) => {
       const s = results.getSummary();
+      const safe = (v: number | null | undefined): number => (typeof v === 'number' ? v : 0);
       const final: SpeedtestResult = {
-        download:   (s.download   ?? 0) / 1e6,
-        upload:     (s.upload     ?? 0) / 1e6,
-        latency:     s.latency    ?? 0,
-        jitter:      s.jitter     ?? 0,
-        packetLoss: (s.packetLoss ?? 0) * 100,
-        timestamp:   Date.now(),
+        download:   safe(s.download)   / 1e6,
+        upload:     safe(s.upload)     / 1e6,
+        latency:    safe(s.latency),
+        jitter:     safe(s.jitter),
+        packetLoss: safe(s.packetLoss) * 100,
+        timestamp:  Date.now(),
       };
       setResult(final);
       setProgress({});
