@@ -37,6 +37,8 @@ export function getWeatherInfo(code: number) {
   return WMO_CODES[code] ?? { label: 'Unknown', emoji: '🌡️' };
 }
 
+const REFRESH_MS = 5 * 60 * 1000; // re-fetch weather every 5 minutes
+
 export function useWeather() {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,9 +47,14 @@ export function useWeather() {
   useEffect(() => {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${LOCATION.lat}&longitude=${LOCATION.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day&temperature_unit=celsius&wind_speed_unit=kmh&timezone=auto`;
 
-    fetch(url)
-      .then((r) => r.json())
-      .then((data) => {
+    let cancelled = false;
+
+    const fetchWeather = async (silent: boolean) => {
+      if (!silent) setLoading(true);
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (cancelled) return;
         const c = data.current;
         setWeather({
           temp: Math.round(c.temperature_2m),
@@ -57,9 +64,22 @@ export function useWeather() {
           weathercode: c.weather_code,
           isDay: c.is_day,
         });
-      })
-      .catch(() => setError('Unable to fetch weather'))
-      .finally(() => setLoading(false));
+        setError(null);
+      } catch {
+        if (!cancelled) setError('Unable to fetch weather');
+      } finally {
+        if (!cancelled && !silent) setLoading(false);
+      }
+    };
+
+    // Initial fetch shows the loading state; subsequent polls update silently
+    fetchWeather(false);
+    const id = setInterval(() => fetchWeather(true), REFRESH_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, []);
 
   return { weather, loading, error };

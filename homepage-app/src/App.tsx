@@ -6,6 +6,7 @@ import SearchBar from './components/SearchBar';
 import VocabWidget from './components/widgets/VocabWidget';
 import FunFactWidget from './components/widgets/FunFactWidget';
 import QuoteWidget from './components/widgets/QuoteWidget';
+import SpeedtestWidget from './components/widgets/SpeedtestWidget';
 
 export default function App() {
   const { bg, loaded, tint } = useBackground();
@@ -48,12 +49,14 @@ export default function App() {
         <Clock />
       </main>
 
-      {/* Widget row — staggered entrance, all cards stretched to equal height */}
+      {/* Widget row — staggered entrance, all cards stretched to equal height.
+          Stacks on mobile, 2-up on tablet, 4-up on desktop. */}
       <section className="relative z-10 px-4 sm:px-8 pb-6 sm:pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto items-stretch">
-          <div className="rise-in h-full" style={{ animationDelay: '0ms' }}><VocabWidget /></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto items-stretch">
+          <div className="rise-in h-full" style={{ animationDelay: '0ms'   }}><VocabWidget /></div>
           <div className="rise-in h-full" style={{ animationDelay: '120ms' }}><FunFactWidget /></div>
           <div className="rise-in h-full" style={{ animationDelay: '240ms' }}><QuoteWidget /></div>
+          <div className="rise-in h-full" style={{ animationDelay: '360ms' }}><SpeedtestWidget /></div>
         </div>
       </section>
     </div>
