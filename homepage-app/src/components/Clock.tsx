@@ -25,32 +25,32 @@ export default function Clock() {
   });
 
   return (
-    <div className="select-none flex flex-col items-center gap-4 sm:gap-5">
+    <div className="select-none flex flex-col items-center gap-1.5 sm:gap-2">
       {/* Greeting */}
       <p
         className="text-white/65"
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 'clamp(0.7rem, 1.1vw, 0.85rem)',
+          fontSize: 'clamp(0.62rem, 0.95vw, 0.78rem)',
           fontWeight: 500,
-          letterSpacing: '0.4em',
+          letterSpacing: '0.38em',
           textTransform: 'uppercase',
         }}
       >
         {emoji}&nbsp;&nbsp;{greeting}
       </p>
 
-      {/* Time — Inter, weight 500, big and present */}
+      {/* Time — compact size for header placement */}
       <div
         className="text-white"
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+          fontSize: 'clamp(2.25rem, 5.5vw, 3.75rem)',
           fontWeight: 200,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.04em',
           lineHeight: 0.95,
-          textShadow: '0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(0,0,0,0.3)',
+          textShadow: '0 3px 20px rgba(0,0,0,0.55), 0 0 60px rgba(0,0,0,0.25)',
         }}
       >
         {hh}:{mm}
@@ -61,9 +61,9 @@ export default function Clock() {
         className="text-white/60"
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 'clamp(0.7rem, 1.15vw, 0.85rem)',
+          fontSize: 'clamp(0.6rem, 0.95vw, 0.75rem)',
           fontWeight: 400,
-          letterSpacing: '0.32em',
+          letterSpacing: '0.3em',
           textTransform: 'uppercase',
         }}
       >

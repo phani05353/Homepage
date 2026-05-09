@@ -38,16 +38,27 @@ export default function App() {
         }}
       />
 
-      {/* Top bar */}
-      <header className="relative z-10 flex items-center justify-between gap-3 px-4 sm:px-8 pt-4 sm:pt-6">
-        <WeatherBar />
-        <SearchBar />
+      {/* Top bar — Weather (left) | Clock (centre) | Search (right) on desktop.
+          Clock stacks above Weather/Search on mobile. */}
+      <header className="relative z-10 px-4 sm:px-8 pt-4 sm:pt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 items-center gap-3">
+          {/* Clock — full width on mobile (row 1, both cols), centre col on desktop */}
+          <div className="col-span-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 flex justify-center">
+            <Clock />
+          </div>
+          {/* Weather — auto row 2 on mobile, col 1 row 1 on desktop */}
+          <div className="sm:col-start-1 sm:row-start-1 sm:justify-self-start">
+            <WeatherBar />
+          </div>
+          {/* Search — col 2 mobile / col 3 desktop */}
+          <div className="justify-self-end sm:col-start-3 sm:row-start-1">
+            <SearchBar />
+          </div>
+        </div>
       </header>
 
-      {/* Center — clock */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center gap-2 px-4 sm:px-8 py-8 sm:py-12">
-        <Clock />
-      </main>
+      {/* Empty middle — gives the background photo room to breathe */}
+      <main className="relative z-10 flex-1" />
 
       {/* Widget row — staggered entrance, all cards stretched to equal height.
           Stacks on mobile, 2-up on tablet, 4-up on desktop. */}
