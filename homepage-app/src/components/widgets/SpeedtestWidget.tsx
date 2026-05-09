@@ -46,8 +46,8 @@ export default function SpeedtestWidget() {
   return (
     <div
       onClick={handleWidgetClick}
-      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 ${
-        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[88px] cursor-pointer'
+      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-2.5 sm:gap-3 ${
+        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[110px] cursor-pointer'
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -70,12 +70,25 @@ export default function SpeedtestWidget() {
         </div>
       </div>
 
-      {/* Collapsed preview — headline metric: download speed */}
+      {/* Collapsed preview — Down + Up + Latency in a tight row */}
       {!expanded && (display || running) && (
-        <p className="text-white text-base font-semibold tabular-nums leading-tight">
-          <span className="text-cyan-200/70 text-[10px] uppercase tracking-wider mr-1.5">Down</span>
-          {formatSpeed(display?.download)}
-        </p>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-baseline gap-3 tabular-nums">
+            <span className="text-white text-base font-semibold leading-tight">
+              <Download size={10} className="inline text-cyan-200/70 mr-1 -translate-y-px" />
+              {formatSpeed(display?.download)}
+            </span>
+            <span className="text-white/80 text-base font-semibold leading-tight">
+              <Upload size={10} className="inline text-cyan-200/70 mr-1 -translate-y-px" />
+              {formatSpeed(display?.upload)}
+            </span>
+          </div>
+          {display?.latency != null && (
+            <p className="text-white/55 text-[11px] tabular-nums">
+              Latency {formatMs(display.latency)} · Jitter {formatMs(display.jitter)}
+            </p>
+          )}
+        </div>
       )}
       {!expanded && !display && !running && error && (
         <p className="text-red-200/80 text-xs">{error}</p>

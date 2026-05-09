@@ -22,18 +22,13 @@ export default function FunFactWidget() {
     fetchAnother().then(() => setSpinning(false));
   };
 
-  // Short preview for collapsed state — first sentence or ~70 chars
-  const preview = fact?.text
-    ? fact.text.length > 70
-      ? fact.text.slice(0, 70).trimEnd() + '…'
-      : fact.text
-    : null;
+  // line-clamp handles truncation in CSS, so just pass the full text through
 
   return (
     <div
       onClick={handleWidgetClick}
-      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 ${
-        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[88px] cursor-pointer'
+      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-2.5 sm:gap-3 ${
+        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[110px] cursor-pointer'
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -56,9 +51,12 @@ export default function FunFactWidget() {
         </div>
       </div>
 
-      {/* Collapsed preview */}
-      {!expanded && preview && (
-        <p className="text-white/85 text-xs leading-snug">{preview}</p>
+      {/* Collapsed preview — 3 lines of the fact, ellipsised */}
+      {!expanded && fact && (
+        <p className="text-white/85 text-xs leading-snug line-clamp-3">
+          <span className="mr-1">💡</span>
+          {fact.text}
+        </p>
       )}
       {!expanded && !fact && error && (
         <p className="text-red-200/80 text-xs">{error}</p>

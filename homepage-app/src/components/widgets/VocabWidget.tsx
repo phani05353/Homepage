@@ -39,8 +39,8 @@ export default function VocabWidget() {
   return (
     <div
       onClick={handleWidgetClick}
-      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 ${
-        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[88px] cursor-pointer'
+      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-2.5 sm:gap-3 ${
+        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[110px] cursor-pointer'
       }`}
     >
       {/* Header */}
@@ -64,14 +64,19 @@ export default function VocabWidget() {
         </div>
       </div>
 
-      {/* Collapsed preview */}
+      {/* Collapsed preview — word + part of speech, then short meaning */}
       {!expanded && data && (
-        <p className="text-white text-base capitalize font-medium leading-tight">
-          {data.word}
-          {data.partOfSpeech && (
-            <span className="text-violet-200/60 text-xs italic ml-2 normal-case">{data.partOfSpeech}</span>
+        <div className="flex flex-col gap-1">
+          <p className="text-white text-base font-medium leading-tight">
+            <span className="capitalize">{data.word}</span>
+            {data.partOfSpeech && (
+              <span className="text-violet-200/65 text-[11px] italic ml-2">{data.partOfSpeech}</span>
+            )}
+          </p>
+          {data.meaning && (
+            <p className="text-white/55 text-xs leading-snug line-clamp-2">{data.meaning}</p>
           )}
-        </p>
+        </div>
       )}
       {!expanded && !data && error && (
         <p className="text-red-200/80 text-xs">{error}</p>

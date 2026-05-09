@@ -35,8 +35,8 @@ export default function QuoteWidget() {
   return (
     <div
       onClick={handleWidgetClick}
-      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-3 sm:gap-4 ${
-        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[88px] cursor-pointer'
+      className={`glass-dark rounded-2xl sm:rounded-3xl p-4 sm:p-5 widget-shadow widget-hover flex flex-col gap-2.5 sm:gap-3 ${
+        expanded ? 'min-h-[200px] sm:min-h-[220px]' : 'min-h-[110px] cursor-pointer'
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -59,9 +59,12 @@ export default function QuoteWidget() {
         </div>
       </div>
 
-      {/* Collapsed preview — show author */}
+      {/* Collapsed preview — 2 lines of quote + author */}
       {!expanded && quote && (
-        <p className="text-white/85 text-xs italic">— {quote.author}</p>
+        <div className="flex flex-col gap-1">
+          <p className="text-white/85 text-xs italic leading-snug line-clamp-2">"{quote.text}"</p>
+          <p className="text-emerald-200/75 text-[10px]">— {quote.author}</p>
+        </div>
       )}
       {!expanded && !quote && error && (
         <p className="text-red-200/80 text-xs">{error}</p>
